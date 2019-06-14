@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pky.my.shop.web.admin.mapper.TbUserDao">
+    <sql id="TbUserColumns">
+        a.id,
+        a.username,
+        a.password,
+        a.phone,
+        a.email,
+        a.created,
+        a.updated
+    </sql>
+    <!--分页查询-->
+    <select id="page" resultType="TbUser" parameterType="Map">
+        SELECT
+          <include refid="TbUserColumns"/>
+        FROM
+          tb_user AS a
+        <where>
+            <if test="entity.username != null and entity.username !=''">
+                AND a.username LIKE CONCAT('%',#{entity.username},'%')
+            </if>
+            <if test="entity.phone != null and entity.phone !=''">
+                AND a.phone LIKE CONCAT('%',#{entity.phone},'%')
+            </if>
+            <if test="entity.email != null and entity.email !=''">
+                AND a.email LIKE CONCAT('%',#{entity.email},'%')
+            </if>
+        </where>
+        LIMIT #{start},#{length}
+    </select>
+    <!--查询总数据数-->
+    <select id="count" resultType="Integer">
+        SELECT COUNT(*)
+        FROM tb_user
+        <where>
+            <if test="username != null and username !=''">
+                AND username LIKE CONCAT('%',#{username},'%')
+            </if>
+            <if test="phone != null and phone !=''">
+                AND phone LIKE CONCAT('%',#{phone},'%')
+            </if>
+            <if test="email != null and email !=''">
+                AND email LIKE CONCAT('%',#{email},'%')
+            </if>
+        </where>
+    </select>
+    <!--查询登陆用户信息-->
+    <select id="getTbUser" resultType="TbUser">
+        SELECT
+        <include refid="TbUserColumns" />
+        FROM
+          tb_user AS a
+        WHERE a.username = #{username} OR a.phone = #{phone} OR a.email = #{email}
+    </select>
+
+    <!--根据id查询用户信息-->
+    <select id="selectById" resultType="TbUser">
+        SELECT
+          <include refid="TbUserColumns"/>
+        FROM
+          tb_user AS a
+        WHERE a.id = #{id}
+    </select>
+    <!--增加用户信息-->
+    <insert id="insert" >
+        insert into tb_user(
+          username,
+          password,
+          phone,
+          email,
+          created,
+          updated
+          )
+        values (
+            #{username},
+            #{password},
+            #{phone},
+            #{email},
+            #{created},
+            #{updated}
+          )
+    </insert>
+
+    <!--根据id删除用户信息-->
+    <delete id="delete" parameterType="com.pky.my.shop.domain.TbUser">
+        DELETE FROM tb_user WHERE id = #{id}
+    </delete>
+
+    <!--更新用户信息-->
+    <update id="update" parameterType="com.pky.my.shop.domain.TbUser">
+        UPDATE tb_user As a SET
+          a.username = #{username},
+        <if test="password != null">
+            a.password = #{password},
+        </if>
+          a.phone = #{phone},
+          a.email = #{email},
+        <if test="created != null">
+            a.created = #{created},
+        </if>
+          a.updated = #{updated}
+        WHERE a.id = #{id}
+    </update>
+
+
+</mapper>
